@@ -567,11 +567,17 @@
 
   /* ---------- Intro overlay ---------- */
   var introOverlay = document.getElementById('introOverlay');
-  var openBtn = document.getElementById('openBtn');
-  openBtn.addEventListener('click', function(){
-    introOverlay.classList.add('hidden');
-    burstConfetti({ particleCount: 140, spread: 100 });
-  });
+var openBtn = document.getElementById('openBtn');
+  var music = document.getElementById('bgMusic');
+var musicBtn = document.getElementById('musicToggle');
+var playing = false;
+openBtn.addEventListener('click', function(){
+  introOverlay.classList.add('hidden');
+  burstConfetti({ particleCount: 140, spread: 100 });
+  music.play().catch(function(){});
+  playing = true;
+  musicBtn.classList.add('playing');
+});
 
   /* ---------- Ambient hearts (created once, loop via CSS) ---------- */
   var heartsBg = document.getElementById('heartsBg');
@@ -704,15 +710,7 @@
   var music = document.getElementById('bgMusic');
   var musicBtn = document.getElementById('musicToggle');
   var playing = false;
-  musicBtn.addEventListener('click', function(){
-    if (!music.querySelector('source')) {
-      musicBtn.title = 'Tambahkan file musik di kode (lihat komentar di HTML)';
-      return;
-    }
-    if (playing) { music.pause(); } else { music.play().catch(function(){}); }
-    playing = !playing;
-    musicBtn.classList.toggle('playing', playing);
-  });
+  
 
 })();
 </script>
