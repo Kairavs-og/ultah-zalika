@@ -1201,7 +1201,7 @@ var fadeInterval = null;
 function fadeVolumeIn(){
   clearInterval(fadeInterval);
   music.volume = 0;
-  var target = 0.35; /* volume dikecilkan biar gak terlalu keras */
+  var target = 0.15; /* volume dikecilkan biar gak terlalu keras */
   fadeInterval = setInterval(function(){
     music.volume = Math.min(target, music.volume + 0.02);
     if (music.volume >= target) clearInterval(fadeInterval);
