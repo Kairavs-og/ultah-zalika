@@ -33,7 +33,7 @@ body{
 h1,h2,h3{font-family:'Fraunces',serif;font-weight:600;}
 section{
   position:relative;
-  padding:6rem 1.5rem;
+  padding:4.5rem 1.5rem;
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -720,8 +720,8 @@ button:focus-visible, .star:focus-visible, .balloon:focus-visible{
 /* ---------- Closing ---------- */
 .closing-section{
   color:var(--cream);
-  min-height:70vh;
-  min-height:calc(var(--vh) * 70);
+  min-height:60vh;
+  min-height:calc(var(--vh) * 60);
   justify-content:center;
 }
 .closing-title{color:var(--cream);font-size:clamp(1.9rem,6vw,2.8rem);}
@@ -746,7 +746,7 @@ footer{
   background:var(--cream);
 }
 @media (max-width:480px){
-  section{padding:4.5rem 1.2rem;}
+  section{padding:3.5rem 1.2rem;}
   .letter-card{padding:2rem 1.3rem;}
   .polaroid{width:44%;}
   .music-widget{transform:scale(.9);transform-origin:top right;}
@@ -755,6 +755,134 @@ footer{
   *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important;}
   html{scroll-behavior:auto;}
 }
+
+/* ---------- Easter egg modal ---------- */
+.egg-overlay{
+  position:fixed;
+  inset:0;
+  z-index:110;
+  background:rgba(24,15,44,.9);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:2rem 1.5rem;
+  opacity:0;
+  visibility:hidden;
+  transition:opacity .4s ease, visibility .4s ease;
+}
+.egg-overlay.active{opacity:1;visibility:visible;}
+.egg-card{
+  background:var(--cream);
+  border-radius:24px;
+  padding:2.4rem 2rem;
+  max-width:420px;
+  width:100%;
+  text-align:center;
+  box-shadow:0 25px 60px rgba(0,0,0,.4);
+  transform:scale(.8) translateY(20px);
+  opacity:0;
+  transition:transform .45s cubic-bezier(.34,1.56,.64,1), opacity .35s ease;
+}
+.egg-overlay.active .egg-card{
+  transform:scale(1) translateY(0);
+  opacity:1;
+}
+.egg-emoji{font-size:2.6rem;margin-bottom:.6rem;}
+.egg-title{font-family:'Fraunces',serif;font-size:1.4rem;color:var(--plum);margin-bottom:.8rem;}
+.egg-text{font-size:1rem;line-height:1.8;color:var(--plum);opacity:.85;white-space:pre-line;}
+.egg-close{
+  margin-top:1.6rem;
+  padding:.75rem 1.8rem;
+  border-radius:999px;
+  background:var(--plum);
+  color:var(--cream);
+  font-weight:700;
+  font-size:.95rem;
+}
+.hero-title .name{
+  cursor:pointer;
+  display:inline-block;
+  transition:transform .15s ease;
+}
+.hero-title .name:active{transform:scale(.92);}
+
+/* ---------- Math puzzle easter egg ---------- */
+.math-egg-btn{
+  position:fixed;
+  bottom:calc(1.1rem + env(safe-area-inset-bottom));
+  left:calc(1.1rem + env(safe-area-inset-left));
+  z-index:90;
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  background:rgba(58,31,67,.55);
+  backdrop-filter:blur(6px);
+  border:1px solid rgba(255,247,236,.25);
+  color:var(--cream);
+  font-size:1.15rem;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity:.5;
+  animation:mathBtnPulse 3.5s ease-in-out infinite;
+  transition:opacity .3s ease, transform .3s ease;
+}
+.math-egg-btn:hover,
+.math-egg-btn:active{opacity:1;transform:scale(1.08);}
+@keyframes mathBtnPulse{
+  0%,100%{opacity:.4;}
+  50%{opacity:.75;}
+}
+.egg-card.puzzle-card{max-width:380px;}
+.puzzle-question{
+  font-size:.98rem;
+  line-height:1.75;
+  color:var(--plum);
+  opacity:.85;
+  white-space:pre-line;
+  text-align:left;
+}
+.puzzle-formula{
+  font-family:'Fraunces',serif;
+  font-size:1.25rem;
+  font-weight:600;
+  color:var(--plum);
+  margin:.9rem 0;
+}
+.puzzle-input-row{
+  display:flex;
+  gap:.6rem;
+  margin-top:1.1rem;
+}
+.puzzle-input-row input{
+  flex:1;
+  min-width:0;
+  border:2px solid var(--blush);
+  border-radius:12px;
+  padding:.7rem .9rem;
+  font-size:1rem;
+  color:var(--plum);
+  background:#fff;
+  text-align:center;
+}
+.puzzle-input-row input:focus{outline:none;border-color:var(--rose);}
+.puzzle-input-row button{
+  padding:.7rem 1.1rem;
+  border-radius:12px;
+  background:var(--plum);
+  color:var(--cream);
+  font-weight:700;
+  font-size:.9rem;
+  white-space:nowrap;
+}
+.puzzle-feedback{
+  margin-top:.9rem;
+  font-size:.9rem;
+  font-weight:700;
+  color:var(--rose);
+  min-height:1.3em;
+}
+.puzzle-feedback.correct{color:#3a9d5f;}
 </style>
 </head>
 <body>
@@ -786,7 +914,7 @@ footer{
   <div class="stars" id="starsBg"></div>
   <div class="balloons" id="balloons"></div>
   <div class="hero-content" id="heroContent">
-    <h1 class="hero-title">Selamat Ulang Tahun,<br><span class="name">Zalika</span> 🎉</h1>
+    <h1 class="hero-title">Selamat Ulang Tahun,<br><span class="name" id="heroName">Zalika</span> 🎉</h1>
     <p class="hero-subtitle">Barakallah fii umriki 🌙 — semoga selalu dalam lindungan-Nya</p>
   </div>
   <div class="scroll-hint">gulir ke bawah ↓</div>
@@ -888,6 +1016,32 @@ footer{
 </section>
 
 <footer>dibuat dengan 💛 untuk hari spesial Zalika</footer>
+
+<div class="egg-overlay" id="eggOverlay">
+  <div class="egg-card">
+    <div class="egg-emoji">💌</div>
+    <h3 class="egg-title">Eh, ketauan deh</h3>
+    <p class="egg-text" id="eggText"></p>
+    <button class="egg-close" id="eggClose">Tutup</button>
+  </div>
+</div>
+
+<button class="math-egg-btn" id="mathEggBtn" aria-label="Ada sesuatu di sini" title="?">∫</button>
+<div class="egg-overlay" id="mathEggOverlay">
+  <div class="egg-card puzzle-card">
+    <div class="egg-emoji">🧮</div>
+    <h3 class="egg-title">Khusus anak matematika Unair</h3>
+    <p class="puzzle-question">Ada satu soal kecil buat kamu. Kalau berhasil dijawab, ada sesuatu yang muncul.</p>
+    <p class="puzzle-formula">f(x) = 3x² − 12x + 7</p>
+    <p class="puzzle-question">Di titik x berapa fungsi ini punya nilai minimum?</p>
+    <div class="puzzle-input-row">
+      <input type="text" id="puzzleInput" inputmode="numeric" placeholder="x = ...">
+      <button id="puzzleSubmit">Cek</button>
+    </div>
+    <p class="puzzle-feedback" id="puzzleFeedback"></p>
+    <button class="egg-close" id="mathEggClose">Tutup</button>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1/dist/confetti.browser.min.js"></script>
 <script>
@@ -1047,9 +1201,9 @@ var fadeInterval = null;
 function fadeVolumeIn(){
   clearInterval(fadeInterval);
   music.volume = 0;
-  var target = 0.8;
+  var target = 0.35; /* volume dikecilkan biar gak terlalu keras */
   fadeInterval = setInterval(function(){
-    music.volume = Math.min(target, music.volume + 0.04);
+    music.volume = Math.min(target, music.volume + 0.02);
     if (music.volume >= target) clearInterval(fadeInterval);
   }, 80);
 }
@@ -1076,8 +1230,8 @@ musicBtn.addEventListener('click', function(){
 });
 
 /* One grand-finale moment timed to when THIS song is actually about to end,
-   read straight from its real duration — not tied to how far the person has
-   scrolled. Works no matter how long musik.mp3 actually is. */
+   read straight from its real duration (misal 4:11 = 251 detik) — jadi otomatis
+   pas walau file musik.mp3 diganti dengan durasi lain, tidak perlu di-hardcode. */
 var FINALE_WINDOW = 8;
 var finaleReadyThisLoop = true;
 var finaleBanner = null;
@@ -1272,17 +1426,22 @@ blowBtn.addEventListener('click', function(){
   blowBtn.textContent = 'Rayakan Lagi 🎉';
 });
 
-/* ---------- Wish star ---------- */
+/* ---------- Wish star ----------
+   Fix: sebelumnya elemen ini bisa "ke-klik sendiri" karena listener keydown
+   merespons tombol Spasi juga. Kalau elemen doa masih fokus (habis diklik)
+   lalu user menekan Spasi untuk scroll halaman, doa ikut ke-trigger tanpa
+   sengaja. Sekarang hanya Enter yang valid, dan fokus dilepas setelah dipakai. */
 var wishStar = document.getElementById('wishStar');
 var wishResult = document.getElementById('wishResult');
 function makeWish(){
   wishStar.classList.add('wished');
   burstConfetti({ particleCount: 70, spread: 70, colors: ['#f5b95c', '#fff7ec'] });
   wishResult.textContent = 'Aamiin, semoga Allah kabulkan doamu 🤲';
+  wishStar.blur();
 }
 wishStar.addEventListener('click', makeWish);
 wishStar.addEventListener('keydown', function(e){
-  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); makeWish(); }
+  if (e.key === 'Enter') { e.preventDefault(); makeWish(); }
 });
 
 /* ---------- Celebrate again ---------- */
@@ -1406,6 +1565,90 @@ guestbookForm.addEventListener('submit', function(e){
   showGbToast();
   spawnLoveBurst();
   burstConfetti({ particleCount: 45, spread: 65, origin: { y: 0.75 } });
+});
+
+/* ---------- Easter egg #1: klik nama "Zalika" di hero 7x ---------- */
+var eggOverlay = document.getElementById('eggOverlay');
+var eggText = document.getElementById('eggText');
+var eggClose = document.getElementById('eggClose');
+var heroName = document.getElementById('heroName');
+var nameClickCount = 0;
+var nameClickTimer = null;
+
+var SECRET_MESSAGE = "Oke, ketauan deh kamu iseng klik-klik namamu sendiri 😄\n\nTapi karena kamu nyampe sini, aku mau bilang sesuatu yang agak susah aku ucapin langsung: makasih ya, buat semua hari biasa yang jadi kerasa spesial gara-gara ada kamu. Aku nggak selalu pinter ngungkapin, tapi aku beneran bersyukur banget ada kamu.\n\nSelamat ulang tahun, sayang. Ini pesan diam-diam dariku, buat kamu doang. 🤍";
+
+function openEgg(message){
+  eggText.textContent = message;
+  eggOverlay.classList.add('active');
+  burstConfetti({ particleCount: 120, spread: 120, colors: ['#ff87ab','#f5b95c','#fff7ec'] });
+}
+function closeEgg(){
+  eggOverlay.classList.remove('active');
+}
+eggClose.addEventListener('click', closeEgg);
+eggOverlay.addEventListener('click', function(e){
+  if (e.target === eggOverlay) closeEgg();
+});
+
+heroName.addEventListener('click', function(){
+  nameClickCount++;
+  clearTimeout(nameClickTimer);
+  nameClickTimer = setTimeout(function(){ nameClickCount = 0; }, 2500);
+  if (nameClickCount >= 7) {
+    nameClickCount = 0;
+    openEgg(SECRET_MESSAGE);
+  }
+});
+
+/* ---------- Easter egg #2: teka-teki matematika (khusus buat anak matematika) ---------- */
+var mathEggBtn = document.getElementById('mathEggBtn');
+var mathEggOverlay = document.getElementById('mathEggOverlay');
+var mathEggClose = document.getElementById('mathEggClose');
+var puzzleInput = document.getElementById('puzzleInput');
+var puzzleSubmit = document.getElementById('puzzleSubmit');
+var puzzleFeedback = document.getElementById('puzzleFeedback');
+var puzzleSolved = false;
+
+var MATH_CORRECT_MESSAGE = "Bener, x = 2 🎉\n\nSama kayak fungsi kuadrat itu yang akhirnya nemu titik paling rendah dan paling stabil, aku ngerasa hidup aku juga nemu titik paling nyaman itu pas ada kamu. Nggak semua hal butuh dibuktiin pakai rumus — tapi yang ini, aku yakin banget: aku sayang kamu.\n\nSelamat ulang tahun, sayang. Makasih udah jadi jawaban yang paling pas.";
+
+function openMathEgg(){
+  mathEggOverlay.classList.add('active');
+  setTimeout(function(){ puzzleInput.focus(); }, 350);
+}
+function closeMathEgg(){
+  mathEggOverlay.classList.remove('active');
+}
+mathEggBtn.addEventListener('click', openMathEgg);
+mathEggClose.addEventListener('click', closeMathEgg);
+mathEggOverlay.addEventListener('click', function(e){
+  if (e.target === mathEggOverlay) closeMathEgg();
+});
+
+function checkPuzzle(){
+  if (puzzleSolved) return;
+  var raw = puzzleInput.value.trim().toLowerCase().replace('x', '').replace('=', '').trim();
+  var val = parseFloat(raw);
+  if (!isNaN(val) && Math.abs(val - 2) < 0.01) {
+    puzzleSolved = true;
+    puzzleFeedback.className = 'puzzle-feedback correct';
+    puzzleFeedback.textContent = 'Bener banget! 💚';
+    burstConfetti({ particleCount: 130, spread: 130, colors: ['#ff87ab','#f5b95c','#b498d9'] });
+    setTimeout(function(){
+      eggText.textContent = MATH_CORRECT_MESSAGE;
+      closeMathEgg();
+      eggOverlay.classList.add('active');
+    }, 700);
+  } else if (raw === '') {
+    puzzleFeedback.className = 'puzzle-feedback';
+    puzzleFeedback.textContent = 'Diisi dulu dong jawabannya~';
+  } else {
+    puzzleFeedback.className = 'puzzle-feedback';
+    puzzleFeedback.textContent = 'Coba lagi, masa anak matematika kalah sama turunan kuadrat 😆';
+  }
+}
+puzzleSubmit.addEventListener('click', checkPuzzle);
+puzzleInput.addEventListener('keydown', function(e){
+  if (e.key === 'Enter') { e.preventDefault(); checkPuzzle(); }
 });
 
 })();
