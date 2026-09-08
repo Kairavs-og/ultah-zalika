@@ -1082,7 +1082,7 @@ footer{
         <span></span><span></span><span></span><span></span><span></span>
       </div>
       <p class="voice-time" id="voiceTime">0:00</p>
-      <p class="voice-caption">ucapan ulang tahun sekaligus pesan buat kamu hari ini.</p>
+      <p class="voice-caption">ucapan ulang tahun sekaligus pesan buat kamu hari ini. dari -Surya</p>
     </div>
     <audio id="voiceNote" preload="metadata">
       <source src="pesan-suara.mp3" type="audio/mpeg">
@@ -1537,6 +1537,7 @@ var voicePlayBtn = document.getElementById('voicePlayBtn');
 var voiceWaveform = document.getElementById('voiceWaveform');
 var voiceTime = document.getElementById('voiceTime');
 var voicePlaying = false;
+var musicWasPlayingBeforeVoice = false;
 
 function formatTime(sec){
   if (!sec || isNaN(sec)) return '0:00';
@@ -1549,8 +1550,16 @@ voicePlayBtn.addEventListener('click', function(){
   if (voicePlaying) {
     voiceNote.pause();
   } else {
-    /* pause musik latar sebentar biar suaranya jelas kedengeran */
-    if (playing) { stopMusic(); }
+    /* musik latar cuma dijeda (bukan dimatiin permanen), nanti lanjut sendiri */
+    if (playing) {
+      musicWasPlayingBeforeVoice = true;
+      clearInterval(fadeInterval);
+      music.pause();
+      playing = false;
+      musicBtn.classList.remove('playing');
+    } else {
+      musicWasPlayingBeforeVoice = false;
+    }
     voiceNote.play().catch(function(){});
   }
 });
@@ -1563,6 +1572,10 @@ voiceNote.addEventListener('pause', function(){
   voicePlaying = false;
   voicePlayBtn.textContent = '▶';
   voiceWaveform.classList.remove('playing');
+  if (musicWasPlayingBeforeVoice) {
+    musicWasPlayingBeforeVoice = false;
+    startMusic();
+  }
 });
 voiceNote.addEventListener('ended', function(){
   voiceTime.textContent = formatTime(voiceNote.duration);
