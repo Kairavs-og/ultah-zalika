@@ -246,6 +246,53 @@ button:focus-visible, .star:focus-visible, .balloon:focus-visible{
   background:var(--gold);
   transition:width .15s linear;
 }
+.volume-row{
+  display:flex;
+  align-items:center;
+  gap:.4rem;
+  margin-top:.15rem;
+}
+.volume-icon{
+  font-size:.75rem;
+  opacity:.75;
+  color:var(--cream);
+}
+.volume-slider{
+  -webkit-appearance:none;
+  appearance:none;
+  width:56px;
+  height:14px;
+  background:transparent;
+  cursor:pointer;
+}
+.volume-slider::-webkit-slider-runnable-track{
+  height:3px;
+  border-radius:999px;
+  background:rgba(255,247,236,.3);
+}
+.volume-slider::-moz-range-track{
+  height:3px;
+  border-radius:999px;
+  background:rgba(255,247,236,.3);
+}
+.volume-slider::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  appearance:none;
+  width:13px;
+  height:13px;
+  border-radius:50%;
+  background:var(--gold);
+  margin-top:-5px;
+  box-shadow:0 2px 6px rgba(0,0,0,.35);
+}
+.volume-slider::-moz-range-thumb{
+  width:13px;
+  height:13px;
+  border:none;
+  border-radius:50%;
+  background:var(--gold);
+  box-shadow:0 2px 6px rgba(0,0,0,.35);
+}
 
 /* ---------- Finale banner (fires from the song's own timing, not scroll) ---------- */
 .finale-banner{
@@ -883,6 +930,72 @@ footer{
   min-height:1.3em;
 }
 .puzzle-feedback.correct{color:#3a9d5f;}
+
+/* ---------- Voice note section ---------- */
+.voice-section{}
+.voice-card{
+  background:var(--cream);
+  border-radius:24px;
+  padding:2.2rem 1.8rem;
+  box-shadow:0 16px 40px rgba(58,31,67,.14);
+  max-width:420px;
+  margin:0 auto;
+}
+.voice-play-btn{
+  width:64px;
+  height:64px;
+  border-radius:50%;
+  background:var(--plum);
+  color:var(--cream);
+  font-size:1.5rem;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:0 auto 1.2rem;
+  transition:transform .2s ease, background .2s ease;
+  box-shadow:0 10px 24px rgba(58,31,67,.3);
+}
+.voice-play-btn:hover{transform:scale(1.06);background:#4d2a58;}
+.voice-play-btn:active{transform:scale(.96);}
+.voice-waveform{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  height:36px;
+  margin-bottom:1rem;
+}
+.voice-waveform span{
+  display:block;
+  width:4px;
+  border-radius:999px;
+  background:var(--rose);
+  height:8px;
+  transition:height .2s ease;
+}
+.voice-waveform.playing span{
+  animation:waveBounce 1s ease-in-out infinite;
+}
+.voice-waveform span:nth-child(2n){animation-delay:.15s;}
+.voice-waveform span:nth-child(3n){animation-delay:.3s;}
+.voice-waveform span:nth-child(4n){animation-delay:.45s;}
+.voice-waveform span:nth-child(5n){animation-delay:.6s;}
+@keyframes waveBounce{
+  0%,100%{height:8px;}
+  50%{height:32px;}
+}
+.voice-time{
+  font-size:.85rem;
+  color:var(--plum);
+  opacity:.65;
+  margin-top:.2rem;
+}
+.voice-caption{
+  font-size:.95rem;
+  color:var(--plum);
+  opacity:.8;
+  margin-top:.3rem;
+}
 </style>
 </head>
 <body>
@@ -905,6 +1018,10 @@ footer{
 <div class="music-widget">
   <button class="music-toggle" id="musicToggle" aria-label="Putar musik latar" title="Putar musik latar">🎵</button>
   <div class="music-bar"><div class="music-bar-fill" id="musicProgress"></div></div>
+  <div class="volume-row">
+    <span class="volume-icon">🔉</span>
+    <input type="range" class="volume-slider" id="volumeSlider" min="0" max="0.6" step="0.02" value="0.15" aria-label="Volume musik">
+  </div>
 </div>
 <audio id="bgMusic" loop preload="auto">
   <source src="musik.mp3" type="audio/mpeg">
@@ -949,6 +1066,27 @@ footer{
     <div class="letter-card">
       <p class="letter-text" id="letterText"></p>
     </div>
+  </div>
+</section>
+
+<section class="voice-section" id="voiceSection">
+  <div class="section-inner">
+    <div class="title-wrap glass-light">
+      <h2 class="section-title">Pesan Suara 🎙️</h2>
+      <span class="section-title-accent"></span>
+    </div>
+    <div class="voice-card">
+      <button class="voice-play-btn" id="voicePlayBtn" aria-label="Putar pesan suara">▶</button>
+      <div class="voice-waveform" id="voiceWaveform">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <p class="voice-time" id="voiceTime">0:00</p>
+      <p class="voice-caption">ucapan ulang tahun sekaligus pesan buat kamu hari ini.</p>
+    </div>
+    <audio id="voiceNote" preload="metadata">
+      <source src="pesan-suara.mp3" type="audio/mpeg">
+    </audio>
   </div>
 </section>
 
@@ -1030,7 +1168,7 @@ footer{
 <div class="egg-overlay" id="mathEggOverlay">
   <div class="egg-card puzzle-card">
     <div class="egg-emoji">🧮</div>
-    <h3 class="egg-title">Khusus anak matematika</h3>
+    <h3 class="egg-title">Khusus anak matematika Unair</h3>
     <p class="puzzle-question">Ada satu soal kecil buat kamu. Kalau berhasil dijawab, ada sesuatu yang muncul.</p>
     <p class="puzzle-formula">f(x) = 3x² − 12x + 7</p>
     <p class="puzzle-question">Di titik x berapa fungsi ini punya nilai minimum?</p>
@@ -1077,6 +1215,7 @@ var sceneStops = [
   { id:'hero',             colors:['#180f2c','#3a1f4d','#582a54'] },
   { id:'cakeSection',      colors:['#fff7ec','#ffe9d2','#fff7ec'] },
   { id:'letterSection',    colors:['#fff7ec','#ffe1e8','#ffe1e8'] },
+  { id:'voiceSection',     colors:['#ffe1e8','#ffe9d2','#ffe1e8'] },
   { id:'gallerySection',   colors:['#ffe1e8','#ffe1e8','#fff2e9'] },
   { id:'guestbookSection', colors:['#fff7ec','#fff7ec','#fff7ec'] },
   { id:'wishSection',      colors:['#582a54','#3a1f4d','#180f2c'] },
@@ -1195,18 +1334,26 @@ if (window.matchMedia('(hover:hover) and (pointer:fine)').matches) {
 var music = document.getElementById('bgMusic');
 var musicBtn = document.getElementById('musicToggle');
 var musicProgress = document.getElementById('musicProgress');
+var volumeSlider = document.getElementById('volumeSlider');
 var playing = false;
 var fadeInterval = null;
+var volumeLevel = parseFloat(volumeSlider.value); /* 0.15 default — sengaja pelan biar pas jadi background */
 
 function fadeVolumeIn(){
   clearInterval(fadeInterval);
   music.volume = 0;
-  var target = 0.05; /* volume dikecilkan biar gak terlalu keras */
+  var target = volumeLevel;
   fadeInterval = setInterval(function(){
-    music.volume = Math.min(target, music.volume + 0.02);
+    music.volume = Math.min(target, music.volume + 0.01);
     if (music.volume >= target) clearInterval(fadeInterval);
   }, 80);
 }
+
+volumeSlider.addEventListener('input', function(){
+  volumeLevel = parseFloat(volumeSlider.value);
+  clearInterval(fadeInterval);
+  music.volume = volumeLevel;
+});
 
 function startMusic(){
   music.play().then(function(){
@@ -1383,6 +1530,50 @@ var letterObserver = new IntersectionObserver(function(entries){
   });
 }, { threshold: 0.25 });
 letterObserver.observe(document.getElementById('letterSection'));
+
+/* ---------- Voice note player ---------- */
+var voiceNote = document.getElementById('voiceNote');
+var voicePlayBtn = document.getElementById('voicePlayBtn');
+var voiceWaveform = document.getElementById('voiceWaveform');
+var voiceTime = document.getElementById('voiceTime');
+var voicePlaying = false;
+
+function formatTime(sec){
+  if (!sec || isNaN(sec)) return '0:00';
+  var m = Math.floor(sec / 60);
+  var s = Math.floor(sec % 60);
+  return m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+voicePlayBtn.addEventListener('click', function(){
+  if (voicePlaying) {
+    voiceNote.pause();
+  } else {
+    /* pause musik latar sebentar biar suaranya jelas kedengeran */
+    if (playing) { stopMusic(); }
+    voiceNote.play().catch(function(){});
+  }
+});
+voiceNote.addEventListener('play', function(){
+  voicePlaying = true;
+  voicePlayBtn.textContent = '❚❚';
+  voiceWaveform.classList.add('playing');
+});
+voiceNote.addEventListener('pause', function(){
+  voicePlaying = false;
+  voicePlayBtn.textContent = '▶';
+  voiceWaveform.classList.remove('playing');
+});
+voiceNote.addEventListener('ended', function(){
+  voiceTime.textContent = formatTime(voiceNote.duration);
+});
+voiceNote.addEventListener('timeupdate', function(){
+  var remaining = voiceNote.duration ? voiceNote.duration - voiceNote.currentTime : 0;
+  voiceTime.textContent = formatTime(voiceNote.currentTime);
+});
+voiceNote.addEventListener('loadedmetadata', function(){
+  voiceTime.textContent = formatTime(voiceNote.duration);
+});
 
 /* ---------- Gallery: photos settle in one by one (this section's own signature motion) ---------- */
 var galleryObserver = new IntersectionObserver(function(entries){
