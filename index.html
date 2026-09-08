@@ -49,19 +49,35 @@ button:focus-visible, .star:focus-visible, .balloon:focus-visible{
   outline-offset:4px;
 }
 
+/* ---------- Scroll progress bar ---------- */
+.scroll-progress{
+  position:fixed;
+  top:0;left:0;
+  height:3px;
+  width:0%;
+  background:linear-gradient(90deg,var(--rose),var(--gold));
+  z-index:101;
+  transition:width .1s linear;
+}
+
 /* ---------- Custom heart cursor (desktop only) ---------- */
 .cursor-heart{
   position:fixed;
   top:0;left:0;
-  font-size:1rem;
+  font-size:1.3rem;
   pointer-events:none;
   z-index:9999;
   transform:translate(-50%,-50%);
   display:none;
-  opacity:.8;
+  opacity:.9;
+  transition:transform .12s ease;
 }
+.cursor-heart.pressed{transform:translate(-50%,-50%) scale(.75);}
 @media (hover:hover) and (pointer:fine){
   .cursor-heart{display:block;}
+  html, body, a, button, input, textarea, .balloon, .star, .polaroid, .polaroid img, .music-toggle, .open-btn, .btn, .lightbox-close{
+    cursor:none !important;
+  }
 }
 
 /* ---------- Ambient hearts (fixed, behind content) ---------- */
@@ -146,6 +162,8 @@ button:focus-visible, .star:focus-visible, .balloon:focus-visible{
   box-shadow:0 8px 24px rgba(245,185,92,.35);
   transition:transform .25s ease, box-shadow .25s ease;
   min-height:48px;
+  position:relative;
+  overflow:hidden;
 }
 .open-btn:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 12px 28px rgba(245,185,92,.45);}
 .open-btn:active{transform:translateY(0) scale(.98);}
@@ -290,13 +308,22 @@ button:focus-visible, .star:focus-visible, .balloon:focus-visible{
 }
 
 /* ---------- Reveal on scroll ---------- */
-.reveal{opacity:0;transform:translateY(32px);transition:opacity .8s ease,transform .8s ease;}
-.reveal.visible{opacity:1;transform:translateY(0);}
+.reveal{opacity:0;transform:translateY(32px) scale(.97);transition:opacity .8s ease,transform .8s cubic-bezier(.22,1,.36,1);}
+.reveal.visible{opacity:1;transform:translateY(0) scale(1);}
 .section-title{
   font-size:clamp(1.7rem,5vw,2.4rem);
-  margin-bottom:2rem;
+  margin-bottom:.6rem;
   color:var(--plum);
 }
+.section-title-accent{
+  display:block;
+  width:52px;
+  height:3px;
+  border-radius:999px;
+  background:linear-gradient(90deg,var(--rose),var(--gold));
+  margin:0 auto 1.6rem;
+}
+.section-title-accent--light{background:linear-gradient(90deg,var(--gold),var(--cream));}
 
 /* ---------- Cake ---------- */
 .cake-section{background:var(--cream);}
@@ -361,9 +388,22 @@ button:focus-visible, .star:focus-visible, .balloon:focus-visible{
   font-size:1rem;
   transition:transform .25s ease, background .25s ease;
   min-height:48px;
+  position:relative;
+  overflow:hidden;
 }
 .btn:hover{transform:translateY(-2px);background:#4d2a58;}
 .btn:active{transform:translateY(0);}
+.ripple{
+  position:absolute;
+  border-radius:50%;
+  background:rgba(255,247,236,.55);
+  transform:scale(0);
+  animation:rippleAnim .6s ease-out forwards;
+  pointer-events:none;
+}
+@keyframes rippleAnim{
+  to{transform:scale(2.6);opacity:0;}
+}
 .cake-wish{
   margin-top:1.4rem;
   color:var(--rose);
@@ -418,18 +458,80 @@ button:focus-visible, .star:focus-visible, .balloon:focus-visible{
   background:var(--cream);
   padding:.7rem .7rem 1.6rem;
   box-shadow:0 12px 26px rgba(58,31,67,.18);
-  transition:transform .35s ease, box-shadow .35s ease;
+  transition:transform .2s ease, box-shadow .35s ease;
   width:170px;
+  will-change:transform;
 }
 .polaroid:nth-child(1){transform:rotate(-6deg);}
 .polaroid:nth-child(2){transform:rotate(3deg);}
 .polaroid:nth-child(3){transform:rotate(-3deg);}
-.polaroid:hover{transform:scale(1.07) rotate(0deg);box-shadow:0 18px 34px rgba(58,31,67,.24);z-index:5;}
+.polaroid:hover{box-shadow:0 18px 34px rgba(58,31,67,.24);z-index:5;}
 .polaroid img{
   width:100%;
   aspect-ratio:4/5;
   object-fit:cover;
   display:block;
+}
+
+/* ---------- Lightbox (foto diperbesar) ---------- */
+.lightbox{
+  position:fixed;
+  inset:0;
+  z-index:97;
+  background:rgba(24,15,44,.92);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:3rem 1.5rem;
+  opacity:0;
+  visibility:hidden;
+  transition:opacity .3s ease, visibility .3s ease;
+}
+.lightbox.active{opacity:1;visibility:visible;}
+.lightbox-inner{
+  position:relative;
+  max-width:90vw;
+  max-height:85vh;
+  transform:scale(.8);
+  opacity:0;
+  transition:transform .4s cubic-bezier(.34,1.56,.64,1), opacity .35s ease;
+}
+.lightbox.active .lightbox-inner{transform:scale(1);opacity:1;}
+.lightbox-inner img{
+  max-width:100%;
+  max-height:85vh;
+  border-radius:14px;
+  box-shadow:0 25px 70px rgba(0,0,0,.55);
+  display:block;
+}
+.lightbox-close{
+  position:absolute;
+  top:-2.6rem;
+  right:0;
+  color:var(--cream);
+  font-size:1.6rem;
+  background:rgba(255,247,236,.12);
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.heart-pop{
+  position:absolute;
+  top:50%;left:50%;
+  font-size:5rem;
+  transform:translate(-50%,-50%) scale(0);
+  pointer-events:none;
+  animation:heartPop .8s ease forwards;
+  filter:drop-shadow(0 6px 14px rgba(0,0,0,.35));
+}
+@keyframes heartPop{
+  0%{transform:translate(-50%,-50%) scale(0);opacity:0;}
+  25%{transform:translate(-50%,-50%) scale(1.15);opacity:1;}
+  40%{transform:translate(-50%,-50%) scale(1);opacity:1;}
+  100%{transform:translate(-50%,-50%) scale(1);opacity:0;}
 }
 
 /* ---------- Guestbook ---------- */
@@ -460,31 +562,54 @@ button:focus-visible, .star:focus-visible, .balloon:focus-visible{
   border-color:var(--rose);
 }
 .guestbook-form .btn{align-self:center;margin-top:.2rem;}
-.guestbook-list{
-  display:flex;
-  flex-direction:column;
-  gap:.9rem;
-  max-width:480px;
-  margin:0 auto;
-  text-align:left;
-}
-.guest-card{
-  background:#fff;
-  border-left:4px solid var(--rose);
-  border-radius:10px;
-  padding:.9rem 1.1rem;
-  box-shadow:0 8px 18px rgba(58,31,67,.08);
-}
-.guest-card strong{color:var(--plum);display:block;margin-bottom:.2rem;font-family:'Fraunces',serif;}
-.guest-card p{color:var(--plum);opacity:.85;font-size:.95rem;line-height:1.5;word-wrap:break-word;}
-.guestbook-empty{opacity:.6;font-size:.9rem;text-align:center;}
 .guestbook-note{
-  margin-top:1.4rem;
+  margin-top:.6rem;
   font-size:.78rem;
   opacity:.55;
   max-width:420px;
   margin-left:auto;
   margin-right:auto;
+}
+
+/* ---------- Toast "pesan terkirim" ---------- */
+.gb-toast{
+  position:fixed;
+  bottom:2rem;
+  left:50%;
+  transform:translateX(-50%) translateY(24px);
+  background:var(--plum);
+  color:var(--cream);
+  padding:.9rem 1.6rem;
+  border-radius:999px;
+  display:flex;
+  align-items:center;
+  gap:.55rem;
+  font-weight:700;
+  font-size:.95rem;
+  box-shadow:0 14px 34px rgba(58,31,67,.4);
+  opacity:0;
+  pointer-events:none;
+  z-index:98;
+  transition:opacity .45s ease, transform .45s ease;
+}
+.gb-toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+.gb-toast-icon{font-size:1.15rem;}
+
+/* ---------- Love burst hearts (dari toast pesan) ---------- */
+.love-burst-heart{
+  position:fixed;
+  bottom:6rem;
+  z-index:96;
+  pointer-events:none;
+  animation:loveBurst ease-out forwards;
+}
+@keyframes loveBurst{
+  0%{transform:translateY(0) translateX(0) scale(.5);opacity:0;}
+  15%{opacity:1;}
+  100%{transform:translateY(-14rem) translateX(var(--dx,0)) scale(1.15);opacity:0;}
 }
 
 /* ---------- Wish ---------- */
@@ -553,6 +678,7 @@ footer{
 </head>
 <body>
 
+<div class="scroll-progress" id="scrollProgress"></div>
 <div class="cursor-heart" id="cursorHeart">💗</div>
 <div class="hearts-bg" id="heartsBg"></div>
 
@@ -584,6 +710,7 @@ footer{
 <section class="cake-section reveal" id="cakeSection">
   <div class="section-inner">
     <h2 class="section-title">Waktunya Tiup Lilin 🕯️</h2>
+    <span class="section-title-accent"></span>
     <div class="cake" id="cake">
       <div class="candles">
         <div class="candle"><span class="flame" data-flame></span><span class="smoke" data-smoke></span></div>
@@ -603,6 +730,7 @@ footer{
 <section class="letter-section reveal" id="letterSection">
   <div class="section-inner">
     <h2 class="section-title">Sepucuk Surat Untukmu</h2>
+    <span class="section-title-accent"></span>
     <div class="letter-card">
       <p class="letter-text" id="letterText"></p>
     </div>
@@ -612,6 +740,7 @@ footer{
 <section class="gallery-section reveal" id="gallerySection">
   <div class="section-inner">
     <h2 class="section-title">Kenangan Kita 📸</h2>
+    <span class="section-title-accent"></span>
     <div class="gallery">
       <div class="polaroid"><img src="fotos/foto1.jpg" alt="Kenangan bareng Zalika" loading="lazy"></div>
       <div class="polaroid"><img src="fotos/foto2.jpg" alt="Kenangan bareng Zalika" loading="lazy"></div>
@@ -620,23 +749,33 @@ footer{
   </div>
 </section>
 
+<div class="lightbox" id="lightbox">
+  <div class="lightbox-inner">
+    <button class="lightbox-close" id="lightboxClose" aria-label="Tutup">✕</button>
+    <img id="lightboxImg" src="" alt="Kenangan diperbesar">
+  </div>
+</div>
+
 <section class="guestbook-section reveal" id="guestbookSection">
   <div class="section-inner">
     <h2 class="section-title">Tinggalkan Pesan 💌</h2>
-    <p class="guestbook-sub">Tulis pesan buat aku, nanti kesimpan di sini~</p>
+    <span class="section-title-accent"></span>
+    <p class="guestbook-sub">Tulis pesan buat aku, nanti langsung nyampe~</p>
     <form class="guestbook-form" id="guestbookForm">
       <input type="text" id="guestName" placeholder="Nama kamu" maxlength="30" required>
       <textarea id="guestMsg" placeholder="Tulis pesannya di sini..." maxlength="300" required></textarea>
       <button type="submit" class="btn">Kirim Pesan 💌</button>
     </form>
-    <div class="guestbook-list" id="guestbookList"></div>
-    <p class="guestbook-note">*Pesan kamu langsung terkirim ke Surya 💛</p>
+    <p class="guestbook-note">*Pesan kamu langsung terkirim ke Surya, gak disimpen riwayatnya di sini 💛</p>
   </div>
 </section>
+
+<div class="gb-toast" id="gbToast"><span class="gb-toast-icon">💌</span><span>Pesan terkirim!</span></div>
 
 <section class="wish-section reveal" id="wishSection">
   <div class="section-inner">
     <h2 class="section-title">Panjatkan Doa 🤲</h2>
+    <span class="section-title-accent section-title-accent--light"></span>
     <p>Klik lambangnya, lalu panjatkan doa dalam hati.</p>
     <div class="star" id="wishStar" role="button" tabindex="0" aria-label="Klik untuk memanjatkan doa">🤲</div>
     <p class="wish-result" id="wishResult"></p>
@@ -646,6 +785,7 @@ footer{
 <section class="closing-section reveal" id="closingSection">
   <div class="section-inner">
     <h2 class="closing-title">Selamat Ulang Tahun, Zalika 🎈</h2>
+    <span class="section-title-accent section-title-accent--light"></span>
     <p class="closing-text">Semoga umur baru ini membawa berkah, kesehatan, dan makin dekat sama Allah SWT.</p>
     <button class="btn" id="celebrateBtn">Rayakan Lagi 🎉</button>
     <p class="signature">Dengan cinta,<br>— Surya</p>
@@ -678,6 +818,36 @@ setVH();
 window.addEventListener('resize', setVH);
 window.addEventListener('orientationchange', setVH);
 
+/* ---------- Scroll progress bar ---------- */
+var scrollProgress = document.getElementById('scrollProgress');
+function updateScrollProgress(){
+  var doc = document.documentElement;
+  var scrollTop = window.scrollY || doc.scrollTop;
+  var height = doc.scrollHeight - doc.clientHeight;
+  var pct = height > 0 ? (scrollTop / height) * 100 : 0;
+  scrollProgress.style.width = pct + '%';
+}
+window.addEventListener('scroll', updateScrollProgress, { passive: true });
+window.addEventListener('resize', updateScrollProgress);
+updateScrollProgress();
+
+/* ---------- Button ripple effect ---------- */
+document.querySelectorAll('.btn, .open-btn').forEach(function(btn){
+  btn.addEventListener('click', function(e){
+    var rect = btn.getBoundingClientRect();
+    var size = Math.max(rect.width, rect.height) * 1.4;
+    var ripple = document.createElement('span');
+    ripple.className = 'ripple';
+    ripple.style.width = ripple.style.height = size + 'px';
+    var x = (e.clientX || rect.left + rect.width / 2) - rect.left - size / 2;
+    var y = (e.clientY || rect.top + rect.height / 2) - rect.top - size / 2;
+    ripple.style.left = x + 'px';
+    ripple.style.top = y + 'px';
+    btn.appendChild(ripple);
+    setTimeout(function(){ ripple.remove(); }, 650);
+  });
+});
+
 /* ---------- Custom heart cursor (desktop only) ---------- */
 if (window.matchMedia('(hover:hover) and (pointer:fine)').matches) {
   var cursorHeart = document.getElementById('cursorHeart');
@@ -685,6 +855,10 @@ if (window.matchMedia('(hover:hover) and (pointer:fine)').matches) {
     cursorHeart.style.left = e.clientX + 'px';
     cursorHeart.style.top = e.clientY + 'px';
   });
+  document.addEventListener('mousedown', function(){ cursorHeart.classList.add('pressed'); });
+  document.addEventListener('mouseup', function(){ cursorHeart.classList.remove('pressed'); });
+  document.addEventListener('mouseleave', function(){ cursorHeart.style.opacity = '0'; });
+  document.addEventListener('mouseenter', function(){ cursorHeart.style.opacity = '.9'; });
 }
 
 /* ---------- Music (progress bar + fade-in volume) ---------- */
@@ -892,35 +1066,73 @@ document.getElementById('celebrateBtn').addEventListener('click', function(){
   setTimeout(function(){ burstConfetti({ particleCount: 100, spread: 120, origin: { y: 0.6 } }); }, 250);
 });
 
-/* ---------- Guestbook (saved locally on this device/browser) ---------- */
-var GB_KEY = 'ultahZalikaGuestbook';
-var guestbookForm = document.getElementById('guestbookForm');
-var guestbookList = document.getElementById('guestbookList');
-
-function loadGuestbookData(){
-  try { return JSON.parse(localStorage.getItem(GB_KEY) || '[]'); }
-  catch (e) { return []; }
-}
-function renderGuestbook(){
-  var data = loadGuestbookData();
-  guestbookList.innerHTML = '';
-  if (!data.length) {
-    guestbookList.innerHTML = '<p class="guestbook-empty">Belum ada pesan. Jadi yang pertama, yuk!</p>';
-    return;
-  }
-  data.slice().reverse().forEach(function(item){
-    var card = document.createElement('div');
-    card.className = 'guest-card';
-    var name = document.createElement('strong');
-    name.textContent = item.name;
-    var msg = document.createElement('p');
-    msg.textContent = item.msg;
-    card.appendChild(name);
-    card.appendChild(msg);
-    guestbookList.appendChild(card);
+/* ---------- Polaroid tilt (desktop only) ---------- */
+if (window.matchMedia('(hover:hover) and (pointer:fine)').matches) {
+  document.querySelectorAll('.polaroid').forEach(function(card){
+    var baseRotate = card.style.getPropertyValue('--base-rotate') || 0;
+    card.addEventListener('mousemove', function(e){
+      var rect = card.getBoundingClientRect();
+      var px = (e.clientX - rect.left) / rect.width - 0.5;
+      var py = (e.clientY - rect.top) / rect.height - 0.5;
+      card.style.transform = 'scale(1.06) rotateX(' + (py * -10) + 'deg) rotateY(' + (px * 10) + 'deg)';
+    });
+    card.addEventListener('mouseleave', function(){
+      card.style.transform = '';
+    });
   });
 }
+
+/* ---------- Lightbox foto (klik buat perbesar) ---------- */
+var lightbox = document.getElementById('lightbox');
+var lightboxImg = document.getElementById('lightboxImg');
+var lightboxInner = document.querySelector('.lightbox-inner');
+var lightboxClose = document.getElementById('lightboxClose');
+document.querySelectorAll('.polaroid img').forEach(function(img){
+  img.addEventListener('click', function(){
+    lightboxImg.src = img.currentSrc || img.src;
+    lightboxImg.alt = img.alt;
+    lightbox.classList.add('active');
+  });
+});
+function closeLightbox(){ lightbox.classList.remove('active'); }
+lightboxClose.addEventListener('click', closeLightbox);
+lightbox.addEventListener('click', function(e){
+  if (e.target === lightbox) closeLightbox();
+});
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape') closeLightbox();
+});
+/* Double-click/double-tap foto di lightbox buat efek hati (ala Instagram) */
+var lastTapTime = 0;
+function popHeart(e){
+  var rect = lightboxInner.getBoundingClientRect();
+  var heart = document.createElement('span');
+  heart.className = 'heart-pop';
+  heart.textContent = '💗';
+  if (e && e.clientX) {
+    heart.style.left = (e.clientX - rect.left) + 'px';
+    heart.style.top = (e.clientY - rect.top) + 'px';
+  }
+  lightboxInner.appendChild(heart);
+  setTimeout(function(){ heart.remove(); }, 800);
+  burstConfetti({ particleCount: 20, spread: 45, origin: { y: 0.5 } });
+}
+lightboxImg.addEventListener('dblclick', popHeart);
+lightboxImg.addEventListener('touchend', function(e){
+  var now = Date.now();
+  if (now - lastTapTime < 300) {
+    e.preventDefault();
+    popHeart(e.changedTouches ? e.changedTouches[0] : e);
+  }
+  lastTapTime = now;
+});
+
+/* ---------- Guestbook: kirim langsung ke email, tanpa riwayat ---------- */
+var guestbookForm = document.getElementById('guestbookForm');
+var gbToast = document.getElementById('gbToast');
+var gbToastTimer = null;
 var GB_INBOX_EMAIL = 'shxzgxx@gmail.com';
+
 function sendToInbox(name, msg){
   fetch('https://formsubmit.co/ajax/' + GB_INBOX_EMAIL, {
     method: 'POST',
@@ -930,7 +1142,32 @@ function sendToInbox(name, msg){
       message: msg,
       _subject: 'Pesan baru dari Zalika di web ulang tahun 💌'
     })
-  }).catch(function(){ /* gagal kirim email, tapi pesan tetap tersimpan lokal */ });
+  }).catch(function(){ /* biarin gagal senyap, toast tetap tampil biar UX gak keliatan error */ });
+}
+
+function showGbToast(){
+  clearTimeout(gbToastTimer);
+  gbToast.classList.add('show');
+  gbToastTimer = setTimeout(function(){
+    gbToast.classList.remove('show');
+  }, 3000);
+}
+
+function spawnLoveBurst(){
+  var count = 14;
+  for (var i = 0; i < count; i++) {
+    (function(){
+      var h = document.createElement('span');
+      h.className = 'love-burst-heart';
+      h.textContent = Math.random() > 0.5 ? '💗' : '💛';
+      h.style.left = (42 + Math.random() * 16) + '%';
+      h.style.setProperty('--dx', (Math.random() * 90 - 45) + 'px');
+      h.style.animationDuration = (1.6 + Math.random() * .9) + 's';
+      h.style.fontSize = (1 + Math.random() * .9) + 'rem';
+      document.body.appendChild(h);
+      setTimeout(function(){ h.remove(); }, 2700);
+    })();
+  }
 }
 
 guestbookForm.addEventListener('submit', function(e){
@@ -940,15 +1177,12 @@ guestbookForm.addEventListener('submit', function(e){
   var name = nameEl.value.trim();
   var msg = msgEl.value.trim();
   if (!name || !msg) return;
-  var data = loadGuestbookData();
-  data.push({ name: name, msg: msg, ts: Date.now() });
-  localStorage.setItem(GB_KEY, JSON.stringify(data));
   sendToInbox(name, msg);
   guestbookForm.reset();
-  renderGuestbook();
-  burstConfetti({ particleCount: 45, spread: 65 });
+  showGbToast();
+  spawnLoveBurst();
+  burstConfetti({ particleCount: 45, spread: 65, origin: { y: 0.75 } });
 });
-renderGuestbook();
 
 })();
 </script>
